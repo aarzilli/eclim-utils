@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+my $SEARCHED = $ARGV[0];
+
+my @paths;
+if ($SEARCHED =~ /\./) {
+	$SEARCHED =~ s:\.:/:g;
+	@paths = split /\n/, `find . -path '.*$SEARCHED.class'`;
+} else {
+	@paths = split /\n/, `find . -name $SEARCHED.class`;
+}
+
+if (@paths != 1) {
+	die "Too many results or not enough results:\n".join("\n", @paths)."\n";
+}
+
+my $path = $paths[0];
+
+my @components = split '/', $path;
+
+my $project = $components[1];
+my $class = join '.', @components[4 .. $#components];
+$class =~ s/\.class$//g;
+
+
+print "$project\t$class\n";

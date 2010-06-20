@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for x in $(projls); do
+	eclim -command problems -p $x | egrep '\|e$'
+done | sort | uniq

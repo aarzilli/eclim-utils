@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+my @acc;
+while(<>) {
+	chomp;
+	push @acc, $_;
+}
+
+print join(":", @acc)."\n";

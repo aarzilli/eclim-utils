@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+
+my (@javaopts, $class, @otheropts);
+
+for (@ARGV) {
+	if (not defined $class) {
+		if (/^-/) {
+			push @javaopts, $_;
+		} else {
+			$class = $_;
+		}
+	} else {
+		print STDERR "otherop: $_\n";
+		push @otheropts, $_;
+	}
+}
+
+print STDERR "searching class: $class\n";
+
+my ($project, $realclass) = split /\t/, `find-class $class`, 2;
+chomp $realclass;
+
+print STDERR "project: $project\n";
+print STDERR "realclass: $realclass\n";
+
+my $javaopts = join " ", @javaopts;
+my $otheropts = join " ", @otheropts;
+
+my $command = "ecl-classpath-java $project $javaopts $realclass $otheropts";
+
+print STDERR "command: $command\n";
+
+system($command);

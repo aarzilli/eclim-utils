@@ -1,0 +1,3 @@
+#!/bin/bash
+
+find ./ -name '*.java' -or -name '*.xml' | xargs etags -a

@@ -1,0 +1,1 @@
+git svn rebase && mvn eclipse:eclipse && projrefresh && projproblems

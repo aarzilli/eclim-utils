@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for x in $(projls); do
+	eclim -command project_refresh -p $x
+done
+
+#Other useful commands:
+# eclim -command project_import -f <folder>

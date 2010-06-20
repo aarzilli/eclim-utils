@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+my %variables;
+
+open my $varin, '<', "$ENV{HOME}/.eclcl" or die "Couldn't open ~/.eclcl: $!";
+while (<$varin>) {
+	chomp;
+	my ($var, $val) = split /\s+/, $_, 2;
+	$variables{$var} = $val;
+}
+close $varin;
+
+chomp(my $WD = `pwd`);
+my $PROJECT = $ARGV[0];
+
+open my $clin, '<', "$WD/$PROJECT/.classpath" or die "Couldn't open $PROJECT/.classpath: $!";
+
+# defaults
+print "$WD/$PROJECT/target/test-classes/\n";
+print "$WD/$PROJECT/target/classes/\n";
+
+while (<$clin>) {
+	chomp;
+	next if !m{<classpathentry kind="(.*?)" path="(.*?)"}; 
+	my ($kind, $path) = ($1, $2);
+
+	next if $kind eq 'output';
+	next if $kind eq 'con';
+
+	print STDERR "$kind\t$path\n";
+
+	if ($kind eq 'var') {
+		my $found = 0;
+		for my $var (keys %variables) {
+			if (index($path, $var) == 0) {
+				$path =~ s/$var/$variables{$var}/g;
+				$found = 1;
+				last;
+			}
+		}
+		
+		if (!$found) {
+			die "Couldn't find variable for: $path\n";
+		}
+
+		print "$path\n";
+	} elsif ($kind eq 'src') {
+		if ($path =~ m:^/:) {
+			print "$WD$path/target/classes/\n";
+			print "$WD$path/target/test-classes/\n";
+		} else {
+			print "$WD/$PROJECT/$path/\n";
+		}
+	} else {
+		die "Unknown classpath entry kind: $kind\n";
+	}
+
+
+	#TODO:
+	# - se kind eq 'src' guardare l'inizio, se e` uno slash e` un progetto e va trattato appropriatamente,
+	#   altrimenti e` una directory del progetto corrente
+}
+
+close $clin;

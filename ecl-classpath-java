@@ -1,0 +1,9 @@
+#!/bin/bash
+
+PROJECT=$1
+shift
+
+MYCP=$(ecl-classpath $PROJECT 2>/dev/null | colonsep)
+cd $PROJECT
+rlwrap java -classpath $MYCP $*
+cd -
